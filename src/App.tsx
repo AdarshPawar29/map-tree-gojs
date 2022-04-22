@@ -32,7 +32,7 @@ class TreeNode extends go.Node {
 //     rather than going all the way to the connected nodes
 // - "ToNode": so that they go all the way to the connected nodes
 //     but only bend at the edge of the group
-var ROUTINGSTYLE = "ToGroup";
+var ROUTINGSTYLE = "Normal";
 
 // If you want the regular routing where the Link.[from/to]EndSegmentLength controls
 // the length of the horizontal segment adjacent to the port, don't use this class.
@@ -110,9 +110,15 @@ var linkDataArray = [
 export default function App() {
   // All links must go from a node inside the "Left Side" Group to a node inside the "Right Side" Group.
   function checkLink(
-    fn: { containingGroup: { data: { key: number } } | null },
+    fn: {
+      [x: string]: any;
+      containingGroup: { data: { key: number } } | null;
+    },
     fp: any,
-    tn: { containingGroup: { data: { key: number } } | null },
+    tn: {
+      [x: string]: any;
+      containingGroup: { data: { key: number } } | null;
+    },
     tp: any,
     link: any
   ) {
@@ -122,8 +128,18 @@ export default function App() {
     if (tn.containingGroup === null || tn.containingGroup.data.key !== -2)
       return false;
     //// optional limit to a single mapping link per node
-    //if (fn.linksConnected.any(l => l.category === "Mapping")) return false;
-    //if (tn.linksConnected.any(l => l.category === "Mapping")) return false;
+    if (
+      fn.linksConnected.any(
+        (l: { category: string }) => l.category === "Mapping"
+      )
+    )
+      return false;
+    if (
+      tn.linksConnected.any(
+        (l: { category: string }) => l.category === "Mapping"
+      )
+    )
+      return false;
     return true;
   }
   function initDiagram() {
