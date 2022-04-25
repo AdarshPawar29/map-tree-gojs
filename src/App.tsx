@@ -15,14 +15,14 @@ class TreeNode extends go.Node {
     };
   }
 
-  // findVisibleNode() {
-  //   // redirect links to lowest visible "ancestor" in the tree
-  //   var n = this;
-  //   while (n !== null && !n.isVisible()) {
-  //     n = n.findTreeParentNode();
-  //   }
-  //   return n;
-  // }
+  findVisibleNode() {
+    // redirect links to lowest visible "ancestor" in the tree
+    var n: any = this;
+    while (n !== null && !n.isVisible()) {
+      n = n.findTreeParentNode();
+    }
+    return n;
+  }
 }
 // end TreeNode
 
@@ -147,7 +147,7 @@ export default function App() {
     // set your license key here before creating the diagram: go.Diagram.licenseKey = "...";
     const diagram = $(go.Diagram, {
       "undoManager.isEnabled": true, // must be set to allow for model change listening
-      // 'undoManager.maxHistoryLength': 0,  // uncomment disable undo/redo functionality
+      "undoManager.maxHistoryLength": 0, // uncomment disable undo/redo functionality
       "clickCreatingTool.archetypeNodeData": {
         text: "new node",
         color: "lightblue",
@@ -164,25 +164,25 @@ export default function App() {
     });
 
     // // define a simple Node template
-    // diagram.nodeTemplate = $(
-    //   go.Node,
-    //   "Auto", // the Shape will go around the TextBlock
-    //   new go.Binding("location", "loc", go.Point.parse).makeTwoWay(
-    //     go.Point.stringify
-    //   ),
-    //   $(
-    //     go.Shape,
-    //     "RoundedRectangle",
-    //     { name: "SHAPE", fill: "white", strokeWidth: 0 },
-    //     // Shape.fill is bound to Node.data.color
-    //     new go.Binding("fill", "color")
-    //   ),
-    //   $(
-    //     go.TextBlock,
-    //     { margin: 8, editable: true }, // some room around the text
-    //     new go.Binding("text").makeTwoWay()
-    //   )
-    // );
+    diagram.nodeTemplate = $(
+      go.Node,
+      "Auto", // the Shape will go around the TextBlock
+      new go.Binding("location", "loc", go.Point.parse).makeTwoWay(
+        go.Point.stringify
+      ),
+      $(
+        go.Shape,
+        "RoundedRectangle",
+        { name: "SHAPE", fill: "white", strokeWidth: 0 },
+        // Shape.fill is bound to Node.data.color
+        new go.Binding("fill", "color")
+      ),
+      $(
+        go.TextBlock,
+        { margin: 8, editable: true }, // some room around the text
+        new go.Binding("text").makeTwoWay()
+      )
+    );
     diagram.nodeTemplate = $(
       TreeNode,
       { movable: false, copyable: false, deletable: false }, // user cannot move an individual node
@@ -191,8 +191,7 @@ export default function App() {
         selectionAdorned: false,
         background: "white",
         mouseEnter: (e, node) => (node.background = "aquamarine"),
-        // mouseLeave: (e, node) =>
-        //   (node.background = node.isSelected ? "skyblue" : "white"),
+        mouseLeave: (e, node) => (node.background = "white"),
       },
       new go.Binding("background", "isSelected", (s) =>
         s ? "skyblue" : "white"
@@ -219,13 +218,18 @@ export default function App() {
         go.Panel,
         "Horizontal",
         { position: new go.Point(16, 0) },
-        //// optional icon for each tree node
-        //$(go.Picture,
-        //  { width: 14, height: 14,
-        //    margin: new go.Margin(0, 4, 0, 0),
-        //    imageStretch: go.GraphObject.Uniform,
-        //    source: "images/defaultIcon.png" },
-        //  new go.Binding("source", "src")),
+        // // optional icon for each tree node
+        // $(
+        //   go.Picture,
+        //   {
+        //     width: 14,
+        //     height: 14,
+        //     margin: new go.Margin(0, 4, 0, 0),
+        //     imageStretch: go.GraphObject.Uniform,
+        //     source: "images/defaultIcon.png",
+        //   },
+        //   new go.Binding("source", "src")
+        // ),
         $(go.TextBlock, new go.Binding("text", "key", (s) => "item " + s))
       ) // end Horizontal Panel
     ); // end Node
@@ -311,9 +315,10 @@ export default function App() {
           setsChildPortSpot: false,
           // after the tree layout, change the width of each node so that all
           // of the nodes have widths such that the collection has a given width
-          // commitNodes: function () {
+          // commitNodes: () => {
           //   // overriding TreeLayout.commitNodes
-          //   go.TreeLayout.prototype.commitNodes();
+
+          //   go.TreeLayout.prototype.commitNodes.call(this);
           //   if (ROUTINGSTYLE === "ToGroup") {
           //     updateNodeWidths(group, group.data.width || 100);
           //   }
